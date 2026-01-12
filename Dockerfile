@@ -1,14 +1,12 @@
-# Use NVIDIA CUDA 12.9 with cuDNN and Ubuntu 24.04
-FROM nvidia/cuda:12.9.0-cudnn-devel-ubuntu24.04
+# =============================================================================
+# Stage 1: Builder - Install dependencies and build exo-cuda
+# =============================================================================
+FROM nvidia/cuda:12.9.0-cudnn-devel-ubuntu24.04 AS builder
 
-# Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive \
-    PYTHONUNBUFFERED=1 \
-    EXO_HOME=/root/.cache/exo \
-    VIRTUAL_ENV=/app/exo-cuda/.venv \
-    PATH="/app/exo-cuda/.venv/bin:$PATH"
+    PYTHONUNBUFFERED=1
 
-# Install system dependencies in a single layer
+# Install build dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         python3 \
@@ -17,23 +15,44 @@ RUN apt-get update && \
         python3-venv \
         git \
         build-essential \
-        curl \
-        ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
 WORKDIR /app
 
 # Clone exo-cuda repository
 RUN git clone --depth 1 https://github.com/Scottcjn/exo-cuda.git /app/exo-cuda
 
-# Create venv and install exo-cuda
+# Create venv and install dependencies
 WORKDIR /app/exo-cuda
 RUN python3 -m venv .venv \
     && . .venv/bin/activate \
-    && pip install --upgrade pip setuptools wheel \
-    && pip install -e . \
-    && pip install --upgrade git+https://github.com/tinygrad/tinygrad.git
+    && pip install --no-cache-dir --upgrade pip setuptools wheel \
+    && pip install --no-cache-dir -e . \
+    && pip install --no-cache-dir --upgrade git+https://github.com/tinygrad/tinygrad.git
+
+# =============================================================================
+# Stage 2: Runtime - Minimal image with only runtime dependencies
+# =============================================================================
+FROM nvidia/cuda:12.9.0-cudnn-runtime-ubuntu24.04 AS runtime
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    EXO_HOME=/root/.cache/exo \
+    VIRTUAL_ENV=/app/exo-cuda/.venv \
+    PATH="/app/exo-cuda/.venv/bin:$PATH"
+
+# Install runtime dependencies only
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        python3 \
+        python3-venv \
+        ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the entire exo-cuda directory including venv from builder
+COPY --from=builder /app/exo-cuda /app/exo-cuda
+
+WORKDIR /app/exo-cuda
 
 # Copy entrypoint script
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
@@ -45,5 +64,4 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 # 5678: GRPC peer communication
 EXPOSE 52415 8001 5678
 
-# Set entrypoint
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

@@ -1,0 +1,30 @@
+services:
+  exo-cuda:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: exo-cuda:latest
+    container_name: exo-cuda
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - DEBUG=${DEBUG:-0}
+      - TINYGRAD_DEBUG=${TINYGRAD_DEBUG:-0}
+      - EXO_HOME=/root/.cache/exo
+      - BROADCAST_ADDRESS=${BROADCAST_ADDRESS:-}
+      - DISCOVERY_CONFIG_PATH=${DISCOVERY_CONFIG_PATH:-}
+    volumes:
+      - exo-cache:/root/.cache/exo
+    # Host network for peer auto-discovery (ports exposed directly on host)
+    network_mode: host
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  exo-cache:
+    driver: local

@@ -31,9 +31,9 @@ RUN python3 -m venv .venv \
     && pip install --no-cache-dir --upgrade git+https://github.com/tinygrad/tinygrad.git
 
 # =============================================================================
-# Stage 2: Runtime - Minimal image with only runtime dependencies
+# Stage 2: Runtime - Using devel image (tinygrad compiles CUDA kernels at runtime)
 # =============================================================================
-FROM nvidia/cuda:12.9.0-cudnn-runtime-ubuntu24.04 AS runtime
+FROM nvidia/cuda:12.9.0-cudnn-devel-ubuntu24.04 AS runtime
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \

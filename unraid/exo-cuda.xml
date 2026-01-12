@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>exo-cuda</Name>
+  <Repository>ghcr.io/lapy/exo-cuda-container:latest</Repository>
+  <Registry>https://ghcr.io/lapy/exo-cuda-container</Registry>
+  <Network>host</Network>
+  <MyIP/>
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/lapy/exo-cuda-container</Support>
+  <Project>https://github.com/Scottcjn/exo-cuda</Project>
+  <Overview>
+    Exo-CUDA: Distributed LLM inference with NVIDIA CUDA support via tinygrad.
+    Run large language models across multiple devices with automatic peer discovery.
+    Provides a ChatGPT-compatible API endpoint.
+  </Overview>
+  <Category>AI: MediaApp:Other</Category>
+  <WebUI>http://[IP]:[PORT:52415]</WebUI>
+  <TemplateURL/>
+  <Icon>https://raw.githubusercontent.com/exo-explore/exo/main/docs/exo-logo.png</Icon>
+  <ExtraParams>--gpus all</ExtraParams>
+  <PostArgs/>
+  <CPUset/>
+  <DateInstalled/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires>NVIDIA GPU with CUDA support. NVIDIA driver and nvidia-container-toolkit must be installed.</Requires>
+  <Config Name="Web UI Port" Target="52415" Default="52415" Mode="tcp" Description="Web UI and default API port" Type="Port" Display="always" Required="true" Mask="false">52415</Config>
+  <Config Name="ChatGPT API Port" Target="8001" Default="8001" Mode="tcp" Description="ChatGPT-compatible API port" Type="Port" Display="always" Required="true" Mask="false">8001</Config>
+  <Config Name="GRPC Port" Target="5678" Default="5678" Mode="tcp" Description="GRPC peer communication port" Type="Port" Display="advanced" Required="false" Mask="false">5678</Config>
+  <Config Name="Model Cache" Target="/root/.cache/exo" Default="/mnt/user/appdata/exo-cuda" Mode="rw" Description="Directory for downloaded models" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/exo-cuda</Config>
+  <Config Name="Debug Level" Target="DEBUG" Default="0" Mode="" Description="Debug logging level (0-9)" Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="Tinygrad Debug" Target="TINYGRAD_DEBUG" Default="0" Mode="" Description="Tinygrad debug level (1-6)" Type="Variable" Display="advanced" Required="false" Mask="false">0</Config>
+  <Config Name="ChatGPT API Port Env" Target="CHATGPT_API_PORT" Default="8001" Mode="" Description="ChatGPT API port configuration" Type="Variable" Display="advanced" Required="false" Mask="false">8001</Config>
+  <Config Name="Broadcast Address" Target="BROADCAST_ADDRESS" Default="" Mode="" Description="Override broadcast address for peer discovery" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+  <Config Name="NVIDIA Visible Devices" Target="NVIDIA_VISIBLE_DEVICES" Default="all" Mode="" Description="Which GPUs to expose to the container" Type="Variable" Display="advanced" Required="false" Mask="false">all</Config>
+</Container>
+

@@ -1,10 +1,14 @@
 #!/bin/bash
 set -e
 
+# Activate virtual environment
+source /app/exo-cuda/.venv/bin/activate
+
 # Set default values for environment variables
 DEBUG=${DEBUG:-0}
 TINYGRAD_DEBUG=${TINYGRAD_DEBUG:-0}
 EXO_HOME=${EXO_HOME:-/root/.cache/exo}
+CHATGPT_API_PORT=${CHATGPT_API_PORT:-8001}
 
 # Export environment variables for exo and tinygrad
 export DEBUG
@@ -18,7 +22,11 @@ export CUDA=1
 mkdir -p "$EXO_HOME"
 
 # Build exo command arguments
-EXO_ARGS=()
+EXO_ARGS=(
+    "--inference-engine" "tinygrad"
+    "--chatgpt-api-port" "$CHATGPT_API_PORT"
+    "--disable-tui"
+)
 
 # Add broadcast address if specified
 if [ -n "$BROADCAST_ADDRESS" ]; then
@@ -42,15 +50,14 @@ echo "============================================"
 echo "  DEBUG:           $DEBUG"
 echo "  TINYGRAD_DEBUG:  $TINYGRAD_DEBUG"
 echo "  EXO_HOME:        $EXO_HOME"
+echo "  CHATGPT_API_PORT: $CHATGPT_API_PORT"
 echo "  CUDA:            $CUDA"
 if [ -n "$BROADCAST_ADDRESS" ]; then
     echo "  BROADCAST_ADDRESS: $BROADCAST_ADDRESS"
 fi
-if [ ${#EXO_ARGS[@]} -gt 0 ]; then
-    echo "  Extra args:      ${EXO_ARGS[*]}"
-fi
+echo "  Command: exo ${EXO_ARGS[*]}"
 echo "============================================"
 echo ""
 
-# Run exo with auto-discovery (default behavior)
+# Run exo with tinygrad backend
 exec exo "${EXO_ARGS[@]}"

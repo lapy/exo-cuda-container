@@ -41,12 +41,18 @@ ENV DEBIAN_FRONTEND=noninteractive \
     VIRTUAL_ENV=/app/exo-cuda/.venv \
     PATH="/app/exo-cuda/.venv/bin:$PATH"
 
-# Install runtime dependencies only
+# Install runtime dependencies (including OpenCV requirements)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         python3 \
         python3-venv \
         ca-certificates \
+        # OpenCV dependencies
+        libgl1 \
+        libglib2.0-0 \
+        libsm6 \
+        libxext6 \
+        libxrender1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the entire exo-cuda directory including venv from builder

@@ -18,6 +18,9 @@ export EXO_HOME
 # Ensure CUDA is available to tinygrad
 export CUDA=1
 
+# Suppress transformers warning about PyTorch/TensorFlow (tinygrad is used instead)
+export TRANSFORMERS_VERBOSITY=error
+
 # Create EXO_HOME directory if it doesn't exist
 mkdir -p "$EXO_HOME"
 

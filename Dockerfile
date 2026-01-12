@@ -64,6 +64,14 @@ WORKDIR /app/exo-cuda
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
+# Verify installation - fail build if exo cannot start
+RUN echo "Verifying exo-cuda installation..." && \
+    . /app/exo-cuda/.venv/bin/activate && \
+    python3 -c "from exo.main import run; print('✓ exo.main imports successfully')" && \
+    exo --help > /dev/null && \
+    echo "✓ exo --help works" && \
+    echo "✓ Verification complete"
+
 # Expose ports
 # 52415: Default Web UI and ChatGPT-compatible API
 # 8001: Alternative ChatGPT API port
